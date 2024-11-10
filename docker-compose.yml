@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  george-convert:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./server/uploads:/app/uploads
+      - ./server/converted:/app/converted
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+    restart: unless-stopped
