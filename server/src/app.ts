@@ -6,6 +6,8 @@ import fs from 'fs-extra';
 import { WebSocket, WebSocketServer } from 'ws';
 import { createServer } from 'http';
 import { exec } from 'child_process';
+import { pipeline } from 'stream/promises';
+import { createReadStream } from 'fs';
 
 const app = express();
 const server = createServer(app);
@@ -110,18 +112,15 @@ app.post('/convert', upload.single('file'), async (req, res) => {
     // 执行转换
     await convertFile(inputPath, outputPath, clientId);
 
-    // 读取转换后的文件
-    const convertedFile = await fs.readFile(outputPath);
-
-    // 设置响应头
+    // 使用流式传输发送文件
     res.setHeader('Content-Type', 'application/octet-stream');
     res.setHeader(
       'Content-Disposition', 
       `attachment; filename="${encodeURIComponent(outputFileName)}"`
     );
 
-    // 发送文件
-    res.send(convertedFile);
+    const fileStream = createReadStream(outputPath);
+    await pipeline(fileStream, res);
 
     // 清理临时文件
     try {
