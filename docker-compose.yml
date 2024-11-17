@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  george-convert:
+  george-convert-server:
     build:
       context: ./server
       dockerfile: Dockerfile
@@ -13,4 +13,30 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3001
+    restart: unless-stopped
+
+  george-convert-client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://your-domain:3001
+    depends_on:
+      - george-convert-server
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./nginx/ssl:/etc/nginx/ssl
+      - ./nginx/logs:/var/log/nginx
+    depends_on:
+      - george-convert-server
+      - george-convert-client
     restart: unless-stopped

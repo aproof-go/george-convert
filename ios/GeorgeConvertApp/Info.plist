@@ -1,0 +1,5 @@
+<!-- 添加必要的权限 -->
+<key>NSDocumentPickerUsageDescription</key>
+<string>需要访问文件以进行格式转换</string>
+<key>NSPhotoLibraryUsageDescription</key>
+<string>需要访问照片库以保存转换后的文件</string>
